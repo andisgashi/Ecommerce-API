@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./assets/css/output.css">
+</head>
+<body>
+    <!-- Header injected dynamically -->
+    <section class="header"></section>
+
+    <!-- Checkout section -->
+    <section class="py-16 bg-gray-400">
+        <div class="container mx-auto px-6 py-10">
+
+            <!-- Page title -->
+            <h2 class="text-2xl text-center font-bold mb-6">Checkout</h2>
+
+            <!-- Checkout form container (form is dynamically injected) -->
+            <div id="checkoutFormContainer"></div>
+        </div>
+    </section>
+
+    <!-- Footer injected dynamically -->
+    <section class="footer"></section>
+
+    <script type="module">
+        // Import reusable components
+        import Header from './components/Header.js'
+        import Footer from './components/Footer.js'
+        import initCheckout from './components/Checkout.js'
+
+        // Render header and footer
+        document.querySelector('.header').innerHTML = Header()
+        document.querySelector('.footer').innerHTML = Footer()
+
+        // Initialize checkout form (dynamic form + event listeners)
+        initCheckout()
+    </script>
+</body>
+</html>

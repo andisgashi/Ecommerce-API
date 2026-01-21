@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./assets/css/output.css">
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+    <!-- Header injected dynamically -->
+    <section class="header"></section>
+
+    <!-- Product details section -->
+    <section class="py-12 bg-gray-300">
+        <div class="container mx-auto px-4 lg:px-12 xl:px-24 md:px-4">
+
+            <!-- Product details rendered dynamically -->
+            <div id="product" class="grid md:grid-cols-2 lg:grid-cols-2 xl:gri-cols-2"></div>
+        </div>
+    </section>
+
+    <!-- Footer injected dynamically -->
+    <section class="footer"></section>
+
+    <!-- Handles delegated events for dynamic elements -->
+    <script src="./assets/js/dynamicListener.js"></script>
+
+    <script type="module">
+        // Import reusable components
+        import Header from './components/Header.js'
+        import Product from './components/Product.js'
+        import Footer from './components/Footer.js'
+
+        // Render header
+        document.querySelector('.header').innerHTML = Header()
+
+        // Mobile menu toggle
+        const menu_btn = document.getElementById('menuBtn')
+        const close_btn = document.getElementById('closeBtn')
+        const mobile_menu = document.getElementById('mobileMenu')
+        
+        menu_btn.addEventListener('click', () => {
+            mobile_menu.classList.remove('hidden') 
+        })
+        close_btn.addEventListener('click', () => {
+            mobile_menu.classList.add('hidden')
+        })
+
+        // Get product ID from URL
+        const params = new URLSearchParams(document.location.search)
+        const productId = params.get("id")
+
+        if(productId == null) {
+            // Redirect to shop page if no product ID provided
+            window.location.href = "http://127.0.0.1:5500/shop.html"
+        } else {
+            // Render product details
+            Product({
+                id: productId,
+                container: document.querySelector('#product')
+            })
+       
+            // Handle Add to Cart form submission dynamically
+            const form = document.querySelector('form')
+
+            addDynamicEventListener(document.body, 'submit', 'form', event => {
+                event.preventDefault()
+
+                const elements = event.target.elements
+
+                // Product object encoded in hidden input
+                const product = JSON.parse(decodeURIComponent(elements[1].value))
+                const qty = +elements[0].value
+
+                // Retrieve cart from localStorage (guest cart)
+                let cart = JSON.parse(localStorage.getItem('cart')) || []
+                if(!Array.isArray(cart)) cart = [cart]
+
+                let found = false
+
+                // Update quantity if product already in cart
+                cart = cart.map(item => {
+                    if(item.id == product.id) {
+                        found = true
+                        return { ...item, qty: item.qty + qty}
+                    }
+                    return item
+                })
+
+                // Add product if not already in cart
+                if(!found) {
+                    cart.push({ ...product, qty })
+                }
+
+                // Save updated cart in localStorage
+                localStorage.setItem('cart', JSON.stringify(cart))
+
+                // Notify user
+                alert("Product has added to cart!")
+
+                // Reset form inputs
+                event.target.reset()
+            })
+        }
+
+        // Render footer
+        document.querySelector('.footer').innerHTML = Footer()
+    </script>
+</body>
+</html>

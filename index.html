@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecommerce</title>
+    <link rel="stylesheet" href="./assets/css/output.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+    <!-- Header will be injected dynamically -->
+    <section class="header"></section>
+
+    <!-- Slider / Hero section injected dynamically -->
+    <section class="slider"></section>
+
+    <!-- Latest products section -->
+    <section class="bg-gray-300 py-12">
+        <div class="container mx-auto px-4 md:px-6 lg:px-12 xl:px-24">
+
+            <!-- Section title -->
+            <h2 class="mb-4 font-bold md:text-xl lg:text-2xl">
+                Latest Products
+            </h2>
+
+            <!-- Products will be rendered here via API -->
+            <div 
+                id="products" 
+                class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            </div>
+        </div>
+
+        <!-- Redirect to full shop page -->
+        <div class="text-center mt-16">
+            <a 
+                href="shop.html" 
+                class="bg-gray-100 px-4 py-2 rounded-md font-semibold hover:bg-zinc-600 hover:text-white">
+                See More
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer will be injected dynamically -->
+    <section class="footer"></section>
+
+    <!-- Handles delegated events for dynamically injected components -->
+    <script src="./assets/js/dynamicListener.js"></script>
+
+    <!-- Main page logic -->
+    <script type="module">
+
+        // Import reusable UI components
+        import Header from './components/Header.js'
+        import Slider from './components/Slider.js'
+        import Products from './components/Products.js'
+        import Footer from './components/Footer.js'
+
+        // Render header component
+        document.querySelector('.header').innerHTML = Header()
+
+        // Mobile menu elements
+        const menu_btn = document.getElementById('menuBtn')
+        const close_btn = document.getElementById('closeBtn')
+        const mobile_menu = document.getElementById('mobileMenu')
+
+        // Open mobile menu
+        menu_btn.addEventListener('click', () => {
+            mobile_menu.classList.remove('hidden') 
+        })
+
+        // Close mobile menu
+        close_btn.addEventListener('click', () => {
+            mobile_menu.classList.add('hidden')
+        })
+
+        // Render slider component
+        document.querySelector('.slider').innerHTML = Slider()
+
+        // Fetch and render latest products from API
+        Products({
+            api_url: "https://dummyjson.com/products",
+            container: document.querySelector('#products')
+        })
+
+        // Render footer component
+        document.querySelector('.footer').innerHTML = Footer()
+
+    </script>
+</body>
+</html>
+
+

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search</title>
+    <link rel="stylesheet" href="./assets/css/output.css">
+</head>
+<body>
+    <!-- Header injected dynamically -->
+    <section class="header"></section>
+
+    <!-- Search results section -->
+    <section class="bg-gray-300 py-16">
+        <div class="container mx-auto px-4 lg:px-12 xl:px-24 md:px-6">
+
+            <!-- Title showing search query -->
+            <h2 id="search-title" class="text-gray-700 text-2xl mb-6"></h2>
+
+            <!-- Search results rendered dynamically -->
+            <div id="search-results" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"></div>
+        </div>
+    </section>
+
+    <!-- Suggested products section -->
+    <section class="bg-gray-300 py-16">
+        <div class="container mx-auto px-4 lg:px-12 xl:px-24 md:px-6">
+
+            <h2 class="text-gray-700 font-bold text-xl mb-6">You also may like</h2>
+
+            <!-- Suggestions rendered via API -->
+            <div id="suggestions" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4"></div>
+        </div>
+    </section>
+
+    <!-- Footer injected dynamically -->
+    <section class="footer"></section>
+
+    <script type="module">
+        // Import modules
+        import { fetchProducts } from './components/Search.js'
+        import Header from './components/Header.js'
+        import Suggestions from './components/Suggestions.js'
+        import Footer from './components/Footer.js'
+
+        // Render header
+        document.querySelector('.header').innerHTML = Header()
+
+        // Search container
+        const container = document.getElementById('search-results');
+
+        // Get search query from URL params
+        const params = new URLSearchParams(window.location.search);
+        const searchQuery = params.get('q') || "";
+        const titleSearch = document.getElementById('search-title')
+
+        if (searchQuery.length > 0) {
+            // Show title with query
+            titleSearch.textContent = `Search results for "${searchQuery}"`
+
+            // Fetch products matching query
+            fetchProducts(container, searchQuery); 
+        } else {
+            // No query provided
+            titleSearch.textContent = "Search results"
+
+            container.innerHTML = "<p class='text-white col-span-5 text-center'>No search query provided</p>";
+        }
+
+        // Render product suggestions
+        Suggestions({
+            api_url: "https://dummyjson.com/products?limit=100",
+            container1: document.querySelector('#suggestions')
+        })
+
+        // Render footer
+        document.querySelector('.footer').innerHTML = Footer()
+    </script>
+</body>
+</html>

@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+    <link rel="stylesheet" href="./assets/css/output.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+    <!-- Header injected dynamically -->
+    <section class="header"></section>
+
+    <!-- Main Cart Section -->
+     <section class="py-20 bg-gray-300">
+        <div class="container mx-auto px-2 lg:px-12 xl:px-24 md:px-6">
+
+            <!-- Cart items rendered dynamically -->
+            <div id="cart" class="w-full"></div>
+        </div>
+    </section>
+
+    <!-- Footer injected dynamically -->
+    <section class="footer"></section>
+
+    <!-- Handles delegated events for dynamic elements -->
+    <script src="./assets/js/dynamicListener.js"></script>
+
+    <script type="module">
+        // Import reusable components
+        import Header from './components/Header.js'
+        import Cart, { updateCart } from './components/Cart.js'
+        import Footer from './components/Footer.js'
+
+        // Render header
+        document.querySelector('.header').innerHTML = Header()
+
+        // Mobile menu toggle
+        const menu_btn = document.getElementById('menuBtn')
+        const close_btn = document.getElementById('closeBtn')
+        const mobile_menu = document.getElementById('mobileMenu')
+
+        menu_btn.addEventListener('click', () => mobile_menu.classList.remove('hidden'))
+        close_btn.addEventListener('click', () => mobile_menu.classList.add('hidden'))
+
+        // Render initial Cart
+        document.querySelector('#cart').innerHTML = Cart()
+
+        // Event delegation for increment/decrement/remove cart items
+        document.addEventListener('click', e => {
+            const btn = e.target
+            const id = btn.dataset.id
+            const action = btn.dataset.action
+
+            // Exit if click is not on cart button
+            if (!id || !action) return
+
+            // Get current cart based on user auth
+            const auth_json = localStorage.getItem('auth')
+            const auth = auth_json ? JSON.parse(auth_json) : null
+
+            let cart = []
+            if(auth && auth.is_loggedIn) {
+                // Authenticated user's cart stored by email
+                const cartKey = `cart_${auth.email}`
+                cart = JSON.parse(localStorage.getItem(cartKey)) || []
+            } else {
+                // Guest cart
+                cart = JSON.parse(localStorage.getItem('cart')) || []
+            }
+
+            // Increment quantity
+            if(action === 'inc') {
+                cart = cart.map(item => item.id == id ? {...item, qty: item.qty + 1} : item)
+            }
+
+            // Decrement quantity, but not below 1
+            if(action === 'dec') {
+                cart = cart.map(item => item.id == id && item.qty > 1 ? {...item, qty: item.qty - 1} : item)
+            }
+
+            // Remove item completely
+            if(action === 'remove') {
+                cart = cart.filter(item => item.id != id)
+            }
+
+            // Update cart display and localStorage
+            updateCart(cart)
+        })
+
+        // Render footer
+        document.querySelector('.footer').innerHTML = Footer()
+
+    </script>
+</body>
+</html>

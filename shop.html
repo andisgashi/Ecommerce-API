@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop</title>
+    <link rel="stylesheet" href="./assets/css/output.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+
+    <!-- Header injected dynamically -->
+    <section class="header"></section>
+
+    <!-- Main shop section -->
+    <section class="py-16 bg-gray-300">
+        <div class="container mx-auto px-4 md:px-6 lg:px-12 xl:px-24">
+
+            <!-- Shop title and search input -->
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="font-bold text-gray-800 text-2xl">Shop</h2>
+
+                <!-- Redirects to search page on Enter -->
+                <input 
+                    id="search" 
+                    type="search"
+                    class="border border-white rounded-full px-1 py-1 md:px-5 md:py-2 xl:px-5 xl:py-2"
+                    placeholder="Search by title"
+                />
+            </div>
+
+            <!-- Products grid rendered via API -->
+            <div 
+                id="shop" 
+                class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            </div>
+
+            <!-- Pagination controls -->
+            <div class="flex justify-center mt-16">
+                <button 
+                    id="prev"
+                    class="bg-white hover:bg-gray-400 hover:text-white font-bold py-2 px-5 rounded me-4">
+                    Prev
+                </button>
+
+                <button 
+                    id="next"
+                    class="bg-white hover:bg-gray-400 hover:text-white font-bold py-2 px-5 rounded">
+                    Next
+                </button>    
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer injected dynamically -->
+    <section class="footer"></section>
+
+    <!-- Page logic -->
+    <script type="module">
+
+        // Import reusable components
+        import Header from './components/Header.js'
+        import Products from './components/Products.js'
+        import Footer from './components/Footer.js'
+
+        // Render header
+        document.querySelector('.header').innerHTML = Header()
+
+        // Pagination buttons
+        const prev = document.querySelector('#prev')
+        const next = document.querySelector('#next')
+
+        // Search input
+        const input_search = document.getElementById('search')
+
+        // Mobile menu elements
+        const menu_btn = document.getElementById('menuBtn')
+        const close_btn = document.getElementById('closeBtn')
+        const mobile_menu = document.getElementById('mobileMenu')
+
+        // Open mobile menu
+        menu_btn.addEventListener('click', () => {
+            mobile_menu.classList.remove('hidden') 
+        })
+
+        // Close mobile menu
+        close_btn.addEventListener('click', () => {
+            mobile_menu.classList.add('hidden')
+        })
+
+        // Pagination state
+        let page = 1
+        const minPage = 1
+        const maxPage = 10
+
+        // Initial products fetch
+        Products({            
+            api_url: "https://dummyjson.com/products",
+            container: document.querySelector('#shop'),
+            page: page,
+            limit: 20
+        })
+
+        // Enable / disable pagination buttons based on page state
+        function updateButtons() {
+
+            if (page <= minPage) {
+                prev.classList.add('bg-gray-400', 'cursor-not-allowed', 'opacity-50')
+                prev.classList.remove('bg-white')
+                prev.disabled = true
+            } else {
+                prev.classList.remove('bg-gray-400', 'cursor-not-allowed', 'opacity-50')
+                prev.classList.add('bg-white')
+                prev.disabled = false
+            }
+
+            if (page >= maxPage) {
+                next.classList.add('bg-gray-400', 'cursor-not-allowed', 'opacity-50')
+                next.classList.remove('bg-white')
+                next.disabled = true
+            } else {
+                next.classList.remove('bg-gray-400', 'cursor-not-allowed', 'opacity-50')
+                next.classList.add('bg-white')
+                next.disabled = false
+            }
+        }
+
+        // Go to previous page
+        prev.addEventListener('click', () => {
+            if (page > minPage) {
+                page--
+                Products({
+                    api_url: "https://dummyjson.com/products",
+                    container: document.querySelector('#shop'),
+                    page: page,
+                    limit: 20
+                })
+                window.scroll(0, 0)
+                updateButtons()
+            }
+        })
+
+        // Go to next page
+        next.addEventListener('click', () => {
+            if (page < maxPage) {
+                page++
+                Products({
+                    api_url: "https://dummyjson.com/products",
+                    container: document.querySelector('#shop'),
+                    page: page,
+                    limit: 20
+                })
+                window.scroll(0, 0)
+                updateButtons()
+            }
+        })
+
+        // Redirect to search page on Enter key
+        input_search.addEventListener('keyup', event => {
+            if (event.key === 'Enter') {
+                const query = event.target.value.trim()
+                if (query.length > 0) {
+                    window.location.href = `search.html?q=${encodeURIComponent(query)}`
+                }
+            }
+        })
+
+        // Render footer
+        document.querySelector('.footer').innerHTML = Footer()
+
+    </script>
+</body>
+</html>
